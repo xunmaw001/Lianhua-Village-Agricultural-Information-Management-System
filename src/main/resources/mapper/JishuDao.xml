@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JishuDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jishu_name as jishuName
+        ,a.jishu_uuid_number as jishuUuidNumber
+        ,a.jishu_photo as jishuPhoto
+        ,a.jishu_types as jishuTypes
+        ,a.jishu_video as jishuVideo
+        ,a.jishu_zuoyong as jishuZuoyong
+        ,a.jishu_candi as jishuCandi
+        ,a.jishu_wendu as jishuWendu
+        ,a.jishu_shidu as jishuShidu
+        ,a.jishu_rizhao as jishuRizhao
+        ,a.jishu_jiazhi as jishuJiazhi
+        ,a.jishu_content as jishuContent
+        ,a.jishu_delete as jishuDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JishuView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM jishu  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.jishuName != '' and params.jishuName != null and params.jishuName != 'null' ">
+                and a.jishu_name like CONCAT('%',#{params.jishuName},'%')
+            </if>
+            <if test=" params.jishuUuidNumber != '' and params.jishuUuidNumber != null and params.jishuUuidNumber != 'null' ">
+                and a.jishu_uuid_number like CONCAT('%',#{params.jishuUuidNumber},'%')
+            </if>
+            <if test="params.jishuTypes != null and params.jishuTypes != ''">
+                and a.jishu_types = #{params.jishuTypes}
+            </if>
+            <if test=" params.jishuVideo != '' and params.jishuVideo != null and params.jishuVideo != 'null' ">
+                and a.jishu_video like CONCAT('%',#{params.jishuVideo},'%')
+            </if>
+            <if test=" params.jishuZuoyong != '' and params.jishuZuoyong != null and params.jishuZuoyong != 'null' ">
+                and a.jishu_zuoyong like CONCAT('%',#{params.jishuZuoyong},'%')
+            </if>
+            <if test=" params.jishuCandi != '' and params.jishuCandi != null and params.jishuCandi != 'null' ">
+                and a.jishu_candi like CONCAT('%',#{params.jishuCandi},'%')
+            </if>
+            <if test=" params.jishuWendu != '' and params.jishuWendu != null and params.jishuWendu != 'null' ">
+                and a.jishu_wendu like CONCAT('%',#{params.jishuWendu},'%')
+            </if>
+            <if test=" params.jishuShidu != '' and params.jishuShidu != null and params.jishuShidu != 'null' ">
+                and a.jishu_shidu like CONCAT('%',#{params.jishuShidu},'%')
+            </if>
+            <if test=" params.jishuRizhao != '' and params.jishuRizhao != null and params.jishuRizhao != 'null' ">
+                and a.jishu_rizhao like CONCAT('%',#{params.jishuRizhao},'%')
+            </if>
+            <if test=" params.jishuJiazhi != '' and params.jishuJiazhi != null and params.jishuJiazhi != 'null' ">
+                and a.jishu_jiazhi like CONCAT('%',#{params.jishuJiazhi},'%')
+            </if>
+            <if test=" params.jishuContent != '' and params.jishuContent != null and params.jishuContent != 'null' ">
+                and a.jishu_content like CONCAT('%',#{params.jishuContent},'%')
+            </if>
+            <if test="params.jishuDeleteStart != null and params.jishuDeleteStart != ''">
+                <![CDATA[  and a.jishu_delete >= #{params.jishuDeleteStart}   ]]>
+            </if>
+            <if test="params.jishuDeleteEnd != null and params.jishuDeleteEnd != ''">
+                <![CDATA[  and a.jishu_delete <= #{params.jishuDeleteEnd}   ]]>
+            </if>
+             <if test="params.jishuDelete != null and params.jishuDelete != ''">
+                and a.jishu_delete = #{params.jishuDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.NongziDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.nongzi_name as nongziName
+        ,a.nongzi_uuid_number as nongziUuidNumber
+        ,a.nongzi_photo as nongziPhoto
+        ,a.nongzi_types as nongziTypes
+        ,a.nongzi_kucun_number as nongziKucunNumber
+        ,a.nongzi_new_money as nongziNewMoney
+        ,a.nongzi_clicknum as nongziClicknum
+        ,a.nongzi_content as nongziContent
+        ,a.nongzi_delete as nongziDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.NongziView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM nongzi  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.nongziName != '' and params.nongziName != null and params.nongziName != 'null' ">
+                and a.nongzi_name like CONCAT('%',#{params.nongziName},'%')
+            </if>
+            <if test=" params.nongziUuidNumber != '' and params.nongziUuidNumber != null and params.nongziUuidNumber != 'null' ">
+                and a.nongzi_uuid_number like CONCAT('%',#{params.nongziUuidNumber},'%')
+            </if>
+            <if test="params.nongziTypes != null and params.nongziTypes != ''">
+                and a.nongzi_types = #{params.nongziTypes}
+            </if>
+            <if test="params.nongziKucunNumberStart != null and params.nongziKucunNumberStart != ''">
+                <![CDATA[  and a.nongzi_kucun_number >= #{params.nongziKucunNumberStart}   ]]>
+            </if>
+            <if test="params.nongziKucunNumberEnd != null and params.nongziKucunNumberEnd != ''">
+                <![CDATA[  and a.nongzi_kucun_number <= #{params.nongziKucunNumberEnd}   ]]>
+            </if>
+             <if test="params.nongziKucunNumber != null and params.nongziKucunNumber != ''">
+                and a.nongzi_kucun_number = #{params.nongziKucunNumber}
+             </if>
+            <if test="params.nongziNewMoneyStart != null ">
+                <![CDATA[  and a.nongzi_new_money >= #{params.nongziNewMoneyStart}   ]]>
+            </if>
+            <if test="params.nongziNewMoneyEnd != null ">
+                <![CDATA[  and a.nongzi_new_money <= #{params.nongziNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.nongziNewMoney != null and params.nongziNewMoney != ''">
+                and a.nongzi_new_money = #{params.nongziNewMoney}
+            </if>
+            <if test="params.nongziClicknumStart != null and params.nongziClicknumStart != ''">
+                <![CDATA[  and a.nongzi_clicknum >= #{params.nongziClicknumStart}   ]]>
+            </if>
+            <if test="params.nongziClicknumEnd != null and params.nongziClicknumEnd != ''">
+                <![CDATA[  and a.nongzi_clicknum <= #{params.nongziClicknumEnd}   ]]>
+            </if>
+             <if test="params.nongziClicknum != null and params.nongziClicknum != ''">
+                and a.nongzi_clicknum = #{params.nongziClicknum}
+             </if>
+            <if test=" params.nongziContent != '' and params.nongziContent != null and params.nongziContent != 'null' ">
+                and a.nongzi_content like CONCAT('%',#{params.nongziContent},'%')
+            </if>
+            <if test="params.nongziDeleteStart != null and params.nongziDeleteStart != ''">
+                <![CDATA[  and a.nongzi_delete >= #{params.nongziDeleteStart}   ]]>
+            </if>
+            <if test="params.nongziDeleteEnd != null and params.nongziDeleteEnd != ''">
+                <![CDATA[  and a.nongzi_delete <= #{params.nongziDeleteEnd}   ]]>
+            </if>
+             <if test="params.nongziDelete != null and params.nongziDelete != ''">
+                and a.nongzi_delete = #{params.nongziDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

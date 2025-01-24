@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.NongziOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.nongzi_order_uuid_number as nongziOrderUuidNumber
+        ,a.nongzi_id as nongziId
+        ,a.zhongzhihu_id as zhongzhihuId
+        ,a.buy_number as buyNumber
+        ,a.nongzi_order_dizhi as nongziOrderDizhi
+        ,a.nongzi_order_true_price as nongziOrderTruePrice
+        ,a.nongzi_order_courier_name as nongziOrderCourierName
+        ,a.nongzi_order_courier_number as nongziOrderCourierNumber
+        ,a.nongzi_order_types as nongziOrderTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.NongziOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,nongzi.nongzi_name as nongziName
+        ,nongzi.nongzi_uuid_number as nongziUuidNumber
+        ,nongzi.nongzi_photo as nongziPhoto
+        ,nongzi.nongzi_types as nongziTypes
+        ,nongzi.nongzi_kucun_number as nongziKucunNumber
+        ,nongzi.nongzi_new_money as nongziNewMoney
+        ,nongzi.nongzi_clicknum as nongziClicknum
+        ,nongzi.nongzi_content as nongziContent
+        ,nongzi.nongzi_delete as nongziDelete
+        ,zhongzhihu.zhongzhihu_name as zhongzhihuName
+        ,zhongzhihu.zhongzhihu_photo as zhongzhihuPhoto
+        ,zhongzhihu.zhongzhihu_phone as zhongzhihuPhone
+        ,zhongzhihu.zhongzhihu_id_number as zhongzhihuIdNumber
+        ,zhongzhihu.zhongzhihu_email as zhongzhihuEmail
+        ,zhongzhihu.new_money as newMoney
+
+        FROM nongzi_order  a
+        left JOIN nongzi nongzi ON a.nongzi_id = nongzi.id
+        left JOIN zhongzhihu zhongzhihu ON a.zhongzhihu_id = zhongzhihu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.nongziOrderUuidNumber != '' and params.nongziOrderUuidNumber != null and params.nongziOrderUuidNumber != 'null' ">
+                and a.nongzi_order_uuid_number like CONCAT('%',#{params.nongziOrderUuidNumber},'%')
+            </if>
+            <if test="params.nongziId != null and params.nongziId != ''">
+                and (
+                    a.nongzi_id = #{params.nongziId}
+                )
+            </if>
+            <if test="params.zhongzhihuId != null and params.zhongzhihuId != ''">
+                and (
+                    a.zhongzhihu_id = #{params.zhongzhihuId}
+                )
+            </if>
+            <if test="params.buyNumberStart != null and params.buyNumberStart != ''">
+                <![CDATA[  and a.buy_number >= #{params.buyNumberStart}   ]]>
+            </if>
+            <if test="params.buyNumberEnd != null and params.buyNumberEnd != ''">
+                <![CDATA[  and a.buy_number <= #{params.buyNumberEnd}   ]]>
+            </if>
+             <if test="params.buyNumber != null and params.buyNumber != ''">
+                and a.buy_number = #{params.buyNumber}
+             </if>
+            <if test=" params.nongziOrderDizhi != '' and params.nongziOrderDizhi != null and params.nongziOrderDizhi != 'null' ">
+                and a.nongzi_order_dizhi like CONCAT('%',#{params.nongziOrderDizhi},'%')
+            </if>
+            <if test="params.nongziOrderTruePriceStart != null ">
+                <![CDATA[  and a.nongzi_order_true_price >= #{params.nongziOrderTruePriceStart}   ]]>
+            </if>
+            <if test="params.nongziOrderTruePriceEnd != null ">
+                <![CDATA[  and a.nongzi_order_true_price <= #{params.nongziOrderTruePriceEnd}   ]]>
+            </if>
+            <if test="params.nongziOrderTruePrice != null and params.nongziOrderTruePrice != ''">
+                and a.nongzi_order_true_price = #{params.nongziOrderTruePrice}
+            </if>
+            <if test=" params.nongziOrderCourierName != '' and params.nongziOrderCourierName != null and params.nongziOrderCourierName != 'null' ">
+                and a.nongzi_order_courier_name like CONCAT('%',#{params.nongziOrderCourierName},'%')
+            </if>
+            <if test=" params.nongziOrderCourierNumber != '' and params.nongziOrderCourierNumber != null and params.nongziOrderCourierNumber != 'null' ">
+                and a.nongzi_order_courier_number like CONCAT('%',#{params.nongziOrderCourierNumber},'%')
+            </if>
+            <if test="params.nongziOrderTypes != null and params.nongziOrderTypes != ''">
+                and a.nongzi_order_types = #{params.nongziOrderTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断农资的id不为空 -->
+            <if test=" params.nongziIdNotNull != '' and params.nongziIdNotNull != null and params.nongziIdNotNull != 'null' ">
+                and a.nongzi_id IS NOT NULL
+            </if>
+            <if test=" params.nongziName != '' and params.nongziName != null and params.nongziName != 'null' ">
+                and nongzi.nongzi_name like CONCAT('%',#{params.nongziName},'%')
+            </if>
+            <if test=" params.nongziUuidNumber != '' and params.nongziUuidNumber != null and params.nongziUuidNumber != 'null' ">
+                and nongzi.nongzi_uuid_number like CONCAT('%',#{params.nongziUuidNumber},'%')
+            </if>
+            <if test="params.nongziTypes != null  and params.nongziTypes != ''">
+                and nongzi.nongzi_types = #{params.nongziTypes}
+            </if>
+
+            <if test="params.nongziKucunNumberStart != null  and params.nongziKucunNumberStart != '' ">
+                <![CDATA[  and nongzi.nongzi_kucun_number >= #{params.nongziKucunNumberStart}   ]]>
+            </if>
+            <if test="params.nongziKucunNumberEnd != null  and params.nongziKucunNumberEnd != '' ">
+                <![CDATA[  and nongzi.nongzi_kucun_number <= #{params.nongziKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.nongziKucunNumber != null  and params.nongziKucunNumber != '' ">
+                and nongzi.nongzi_kucun_number = #{params.nongziKucunNumber}
+            </if>
+            <if test="params.nongziNewMoneyStart != null ">
+                <![CDATA[  and nongzi.nongzi_new_money >= #{params.nongziNewMoneyStart}   ]]>
+            </if>
+            <if test="params.nongziNewMoneyEnd != null ">
+                <![CDATA[  and nongzi.nongzi_new_money <= #{params.nongziNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.nongziNewMoney != null and params.nongziNewMoney != ''">
+                and a.nongzi_new_money = #{params.nongziNewMoney}
+            </if>
+            <if test="params.nongziClicknumStart != null  and params.nongziClicknumStart != '' ">
+                <![CDATA[  and nongzi.nongzi_clicknum >= #{params.nongziClicknumStart}   ]]>
+            </if>
+            <if test="params.nongziClicknumEnd != null  and params.nongziClicknumEnd != '' ">
+                <![CDATA[  and nongzi.nongzi_clicknum <= #{params.nongziClicknumEnd}   ]]>
+            </if>
+            <if test="params.nongziClicknum != null  and params.nongziClicknum != '' ">
+                and nongzi.nongzi_clicknum = #{params.nongziClicknum}
+            </if>
+            <if test=" params.nongziContent != '' and params.nongziContent != null and params.nongziContent != 'null' ">
+                and nongzi.nongzi_content like CONCAT('%',#{params.nongziContent},'%')
+            </if>
+            <if test="params.nongziDeleteStart != null  and params.nongziDeleteStart != '' ">
+                <![CDATA[  and nongzi.nongzi_delete >= #{params.nongziDeleteStart}   ]]>
+            </if>
+            <if test="params.nongziDeleteEnd != null  and params.nongziDeleteEnd != '' ">
+                <![CDATA[  and nongzi.nongzi_delete <= #{params.nongziDeleteEnd}   ]]>
+            </if>
+            <if test="params.nongziDelete != null  and params.nongziDelete != '' ">
+                and nongzi.nongzi_delete = #{params.nongziDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(nongzi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(nongzi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断种植户的id不为空 -->
+            <if test=" params.zhongzhihuIdNotNull != '' and params.zhongzhihuIdNotNull != null and params.zhongzhihuIdNotNull != 'null' ">
+                and a.zhongzhihu_id IS NOT NULL
+            </if>
+            <if test=" params.zhongzhihuName != '' and params.zhongzhihuName != null and params.zhongzhihuName != 'null' ">
+                and zhongzhihu.zhongzhihu_name like CONCAT('%',#{params.zhongzhihuName},'%')
+            </if>
+            <if test=" params.zhongzhihuPhone != '' and params.zhongzhihuPhone != null and params.zhongzhihuPhone != 'null' ">
+                and zhongzhihu.zhongzhihu_phone like CONCAT('%',#{params.zhongzhihuPhone},'%')
+            </if>
+            <if test=" params.zhongzhihuIdNumber != '' and params.zhongzhihuIdNumber != null and params.zhongzhihuIdNumber != 'null' ">
+                and zhongzhihu.zhongzhihu_id_number like CONCAT('%',#{params.zhongzhihuIdNumber},'%')
+            </if>
+            <if test=" params.zhongzhihuEmail != '' and params.zhongzhihuEmail != null and params.zhongzhihuEmail != 'null' ">
+                and zhongzhihu.zhongzhihu_email like CONCAT('%',#{params.zhongzhihuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and zhongzhihu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and zhongzhihu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

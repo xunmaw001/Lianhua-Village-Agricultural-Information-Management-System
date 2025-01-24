@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ChanpinDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.zhongzhihu_id as zhongzhihuId
+        ,a.chanpin_name as chanpinName
+        ,a.chanpin_uuid_number as chanpinUuidNumber
+        ,a.chanpin_photo as chanpinPhoto
+        ,a.chanpin_types as chanpinTypes
+        ,a.chanpin_kucun_number as chanpinKucunNumber
+        ,a.chanpin_new_money as chanpinNewMoney
+        ,a.chanpin_clicknum as chanpinClicknum
+        ,a.chanpin_content as chanpinContent
+        ,a.chanpin_delete as chanpinDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ChanpinView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,zhongzhihu.zhongzhihu_name as zhongzhihuName
+        ,zhongzhihu.zhongzhihu_photo as zhongzhihuPhoto
+        ,zhongzhihu.zhongzhihu_phone as zhongzhihuPhone
+        ,zhongzhihu.zhongzhihu_id_number as zhongzhihuIdNumber
+        ,zhongzhihu.zhongzhihu_email as zhongzhihuEmail
+        ,zhongzhihu.new_money as newMoney
+
+        FROM chanpin  a
+        left JOIN zhongzhihu zhongzhihu ON a.zhongzhihu_id = zhongzhihu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.zhongzhihuId != null and params.zhongzhihuId != ''">
+                and (
+                    a.zhongzhihu_id = #{params.zhongzhihuId}
+                )
+            </if>
+            <if test=" params.chanpinName != '' and params.chanpinName != null and params.chanpinName != 'null' ">
+                and a.chanpin_name like CONCAT('%',#{params.chanpinName},'%')
+            </if>
+            <if test=" params.chanpinUuidNumber != '' and params.chanpinUuidNumber != null and params.chanpinUuidNumber != 'null' ">
+                and a.chanpin_uuid_number like CONCAT('%',#{params.chanpinUuidNumber},'%')
+            </if>
+            <if test="params.chanpinTypes != null and params.chanpinTypes != ''">
+                and a.chanpin_types = #{params.chanpinTypes}
+            </if>
+            <if test="params.chanpinKucunNumberStart != null and params.chanpinKucunNumberStart != ''">
+                <![CDATA[  and a.chanpin_kucun_number >= #{params.chanpinKucunNumberStart}   ]]>
+            </if>
+            <if test="params.chanpinKucunNumberEnd != null and params.chanpinKucunNumberEnd != ''">
+                <![CDATA[  and a.chanpin_kucun_number <= #{params.chanpinKucunNumberEnd}   ]]>
+            </if>
+             <if test="params.chanpinKucunNumber != null and params.chanpinKucunNumber != ''">
+                and a.chanpin_kucun_number = #{params.chanpinKucunNumber}
+             </if>
+            <if test="params.chanpinNewMoneyStart != null ">
+                <![CDATA[  and a.chanpin_new_money >= #{params.chanpinNewMoneyStart}   ]]>
+            </if>
+            <if test="params.chanpinNewMoneyEnd != null ">
+                <![CDATA[  and a.chanpin_new_money <= #{params.chanpinNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.chanpinNewMoney != null and params.chanpinNewMoney != ''">
+                and a.chanpin_new_money = #{params.chanpinNewMoney}
+            </if>
+            <if test="params.chanpinClicknumStart != null and params.chanpinClicknumStart != ''">
+                <![CDATA[  and a.chanpin_clicknum >= #{params.chanpinClicknumStart}   ]]>
+            </if>
+            <if test="params.chanpinClicknumEnd != null and params.chanpinClicknumEnd != ''">
+                <![CDATA[  and a.chanpin_clicknum <= #{params.chanpinClicknumEnd}   ]]>
+            </if>
+             <if test="params.chanpinClicknum != null and params.chanpinClicknum != ''">
+                and a.chanpin_clicknum = #{params.chanpinClicknum}
+             </if>
+            <if test=" params.chanpinContent != '' and params.chanpinContent != null and params.chanpinContent != 'null' ">
+                and a.chanpin_content like CONCAT('%',#{params.chanpinContent},'%')
+            </if>
+            <if test="params.chanpinDeleteStart != null and params.chanpinDeleteStart != ''">
+                <![CDATA[  and a.chanpin_delete >= #{params.chanpinDeleteStart}   ]]>
+            </if>
+            <if test="params.chanpinDeleteEnd != null and params.chanpinDeleteEnd != ''">
+                <![CDATA[  and a.chanpin_delete <= #{params.chanpinDeleteEnd}   ]]>
+            </if>
+             <if test="params.chanpinDelete != null and params.chanpinDelete != ''">
+                and a.chanpin_delete = #{params.chanpinDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断种植户的id不为空 -->
+            <if test=" params.zhongzhihuIdNotNull != '' and params.zhongzhihuIdNotNull != null and params.zhongzhihuIdNotNull != 'null' ">
+                and a.zhongzhihu_id IS NOT NULL
+            </if>
+            <if test=" params.zhongzhihuName != '' and params.zhongzhihuName != null and params.zhongzhihuName != 'null' ">
+                and zhongzhihu.zhongzhihu_name like CONCAT('%',#{params.zhongzhihuName},'%')
+            </if>
+            <if test=" params.zhongzhihuPhone != '' and params.zhongzhihuPhone != null and params.zhongzhihuPhone != 'null' ">
+                and zhongzhihu.zhongzhihu_phone like CONCAT('%',#{params.zhongzhihuPhone},'%')
+            </if>
+            <if test=" params.zhongzhihuIdNumber != '' and params.zhongzhihuIdNumber != null and params.zhongzhihuIdNumber != 'null' ">
+                and zhongzhihu.zhongzhihu_id_number like CONCAT('%',#{params.zhongzhihuIdNumber},'%')
+            </if>
+            <if test=" params.zhongzhihuEmail != '' and params.zhongzhihuEmail != null and params.zhongzhihuEmail != 'null' ">
+                and zhongzhihu.zhongzhihu_email like CONCAT('%',#{params.zhongzhihuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and zhongzhihu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and zhongzhihu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
